@@ -3,7 +3,7 @@ let router = express.Router();
 let upload= require("../config/multer")
 let {createpost,getfeed} = require("../controllers/postcontroller")
 router.post(
-    "/create",
+    "/",
     upload.single("media"),
     createpost
 );

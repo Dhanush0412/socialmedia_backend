@@ -3,7 +3,7 @@ let router= express.Router();
 
 let {senddirectmessage,getdirectmessage} = require("../controllers/directmessagecontroller")
 
-router.post("/send",senddirectmessage)
-router.get("/getting/:senderid/:receiverid",getdirectmessage)
+router.post("/",senddirectmessage)
+router.get("/:senderid/:receiverid",getdirectmessage)
 
 module.exports=router

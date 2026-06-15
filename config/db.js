@@ -1,8 +1,13 @@
-let mongoose=require("mongoose");
-mongoose.connect("mongodb+srv://Dhanush:Dhanush%40123@cluster1.pnisbey.mongodb.net/?appName=Cluster1")
+require("dotenv").config();
+
+let mongoose = require("mongoose");
+
+mongoose.connect(
+    process.env.MONGO_URL
+)
 .then(()=>{
-    console.log("MongoDB connected")
+    console.log("mongodb connected");
 })
-.catch((err)=>{
-    console.log(err)
-})
+.catch((error)=>{
+    console.log(error);
+});

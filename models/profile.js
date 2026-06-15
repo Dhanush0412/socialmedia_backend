@@ -9,6 +9,10 @@ let ProfileSchema = mongoose.Schema({
         type: String,
         maxlength:50
     },
+    profilepic:{
+       type:String,
+       default:"default-profile.jpg"
+    },
     groups:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Group"

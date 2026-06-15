@@ -1,8 +1,8 @@
 let express = require("express")
 let router = express.Router();
-let {signup,login} = require("../controllers/usercontroller")
+let {signup,login, forgotpassword} = require("../controllers/usercontroller")
 
-router.post("/signup",signup)
+router.post("/singnp",signup)
 router.post("/login",login)
-
+router.put("/forgot",forgotpassword)
 module.exports=router;

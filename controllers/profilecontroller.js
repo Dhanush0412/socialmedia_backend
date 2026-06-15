@@ -39,15 +39,17 @@ let getdashboard = async(req,res)=>{
     if(!profile){
         return res.status(401).send("profile not exist")
     }
+     console.log(profileid)
+    console.log(profile)
     return res.json({
         profileid : profile._id,
         username : profile.user.username,
         bio:profile.bio,
+        profilepic : profile.profilepic,
         groups : profile.groups.length,
         connections:profile.connections.length
     })
-    console.log(profileid)
-    console.log(profile)
+   
    } catch (error) {
       console.log(error)
       return res.send("internal error")
@@ -76,4 +78,25 @@ let connectionprofile = async(req,res)=>{
     }
 }
 
-module.exports={createprofile,getdashboard,connectionprofile};
+// profile pic updation //
+
+let updatedprofilepic = async(req,res)=>{
+    try {
+        let {profileid} = req.params
+        let profile = await Profile.findById(profileid)
+        if(!profile){
+            return res.send("profile not exist")
+        }
+        profile.profilepic=req.file.filename;
+        await profile.save();
+        return res.json({
+            message:"profile pic updated successfully",
+            profilepic:profile.profilepic
+        })
+
+    } catch (error) {
+        return res.send("internal error in profile setting")
+    }
+}
+
+module.exports={createprofile,getdashboard,connectionprofile,updatedprofilepic};
