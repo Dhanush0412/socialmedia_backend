@@ -28,7 +28,12 @@ let createprofile = async(req,res)=>{
 
 })
     await profile.save()
-    return res.send("profile created")
+    return res.json({
+
+    message:"profile created",
+    profileid:profile._id
+
+   });
    }
    catch(error){
     console.log(error);

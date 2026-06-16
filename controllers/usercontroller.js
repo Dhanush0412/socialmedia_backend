@@ -1,4 +1,5 @@
 let User = require("../models/user")
+let Profile = require("../models/profile")
 let bcrypt = require("bcrypt")
 
 // signup //
@@ -73,7 +74,23 @@ let login = async(req,res)=>{
     if(!ismatch){
         return res.status(401).send("invalid password")
     }
-    return res.send("loggedin successfully")
+    let profile =await Profile.findOne({user:userexist._id});
+
+return res.json({
+
+    message:"loggedin successfully",
+
+    userid:
+    userexist._id,
+
+    profileexists:
+    profile ? true : false,
+
+    profileid:
+    profile ?
+    profile._id:null
+
+});
 
   } catch (error) {
     return res.send("internal error")
