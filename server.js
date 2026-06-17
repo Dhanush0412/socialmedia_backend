@@ -11,6 +11,7 @@ let io = new Server(server,{
         origin:"*"
     }
 })
+
 let socket = require("./socket/socket");
 socket.init(io)
 

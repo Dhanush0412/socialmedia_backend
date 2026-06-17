@@ -58,8 +58,7 @@ let getdirectmessage = async(req,res)=>{
     return res.send("internal error")
    }
 }
-let markmessagesread =
-async(req,res)=>{
+let markmessagesread = async(req,res)=>{
 
     try{
 
