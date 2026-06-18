@@ -82,7 +82,7 @@ return res.json({
 
     userid:
     userexist._id,
-
+    username:userexist.username,
     profileexists:
     profile ? true : false,
 
