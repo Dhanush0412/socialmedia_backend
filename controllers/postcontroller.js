@@ -1,6 +1,6 @@
 let Post = require("../models/post")
 let Profile = require("../models/profile")
-
+let User = require("../models/user")
 
 // post creation //
 
@@ -70,6 +70,10 @@ let likes = async(req,res)=>{
         if(!profile){
             return res.send("profile not found")
         }
+         let post = await Post.findById(postid)
+        if(!post){
+            return res.send("post not found")
+        }
         if(post.likes.includes(profileid)){
             return res.send("already liked")
         }
@@ -114,5 +118,47 @@ let unlike = async(req,res)=>{
     }
 }
 
+let getpost = async(req,res)=>{
+    try {
+        let {username} = req.query;
+         if(!username){
+            return res.send("username required")
+        }
+        let user =  await User.findOne({
+            username:{
+                $regex:username,
+                $options:"i"
+            }
+        });
+       
+        if(!user){
+            return res.send("user not found")
+        }
+        let profile = await Profile.findOne({
+            user:user._id
+        })
+        if(!profile){
+            return res.send("profile not created")
+        }
+        let post = await Post.find({
+            profile:profile._id
+        })
+        .populate({
+            path:"profile",
+            populate:{
+                path:"user"
+            }
+        })
+        .sort({
+            createdAt:-1
+        });
+        return res.json(post);
 
-module.exports= {createpost,getfeed,likes,unlike}
+    } catch (error) {
+        console.log(error)
+        return res.send("internal error")
+    }
+}
+
+
+module.exports= {createpost,getfeed,likes,unlike,getpost}
