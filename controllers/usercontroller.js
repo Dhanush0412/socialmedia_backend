@@ -2,7 +2,8 @@ let User = require("../models/user")
 let Profile = require("../models/profile")
 let bcrypt = require("bcrypt")
 let Otp = require("../models/otp")
-let transporter = require("../config/mail")
+let {transporter,sendloginmail} = require("../config/mail")
+
 // signup //
 
 let signup = async(req,res)=>{
@@ -62,6 +63,7 @@ let signup = async(req,res)=>{
    return res.send("signed up successfully");
 
     } catch (error) {
+        console.log(error)
     return res.send("internal error")
   }
     
@@ -91,9 +93,10 @@ let login = async(req,res)=>{
     }
     let profile =await Profile.findOne({user:userexist._id});
 
-return res.json({
+    sendloginmail(userexist.email,userexist.username)
 
-    message:"loggedin successfully",
+    return res.json({
+      message:"loggedin successfully",
 
     userid:
     userexist._id,

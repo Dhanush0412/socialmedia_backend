@@ -8,11 +8,10 @@ let createpost = async(req,res)=>{
     try {
         let {profileid} = req.params
         let {caption}=req.body
-
         let profile = await Profile.findById(profileid)
         if(!profile){
             return res.send("profile not found")
-        }        
+        }      
         let post = new Post({
             caption:caption,
             media:req.file?
@@ -194,14 +193,10 @@ let getpost = async(req,res)=>{
         return res.json(posts);
 
     }
-
     catch(error){
-
         console.log(error);
-
         return res.send("internal error");
-
     }
-
 }
+
 module.exports= {createpost,getfeed,likes,unlike,getpost,getmyposts}
