@@ -68,7 +68,7 @@ app.use("/group",require("./routes/grouproutes"));
 app.use("/message",require("./routes/messageroutes"));
 app.use("/dmessage",require("./routes/directmessageroutes"));
 app.use("/connection",require("./routes/connectionrequestroutes"))
-app.use("mainlist",require("./routes/chatroutes"))
+app.use("/mainlist",require("./routes/chatroutes"))
  
 // Socket Connection
  
@@ -76,54 +76,37 @@ io.on(
     "connection",
     (socket)=>{
  
-        console.log(
-            "User connected:",
-            socket.id
-        );
- 
- 
-        socket.on(
-            "joingroup",
+        console.log("User connected:",socket.id);
+      
+       
+        socket.on("joingroup",
             (groupid)=>{
  
-                socket.join(
-                    groupid
-                );
- 
-                console.log(
-                    "Joined group:",
-                    groupid
-                );
+               try {
+                 socket.join(groupid);
+                console.log("Joined group:",groupid);
+               } catch (error) {
+                console.log(error);
+               }
  
             }
         );
  
  
-        socket.on(
-            "joinprofile",
-            (profileid)=>{
- 
-                socket.join(
-                    profileid
-                );
- 
-                console.log(
-                    "Joined profile:",
-                    profileid
-                );
+        socket.on("joinprofile",(profileid)=>{
+         try {
+            socket.join(profileid);
+            console.log("Joined profile:",profileid);
+         } catch (error) {
+            console.log(error)
+         }
  
             }
         );
  
  
-        socket.on(
-            "disconnect",
-            ()=>{
- 
-                console.log(
-                    "User disconnected:",
-                    socket.id
-                );
+        socket.on("disconnect",()=>{
+           console.log("User disconnected:",socket.id);
  
             }
         );
