@@ -2,7 +2,7 @@ let express = require("express")
 let verifytoken=require("../middelware/auth")
 let router = express.Router()
 
-let {creategroup,sendgroupinvite,getpendinginvites, acceptinvite,rejectinvite,getmygroup,groupchatpreview,getgroupdetails} = require("../controllers/groupcontroller")
+let {creategroup,sendgroupinvite,getpendinginvites, acceptinvite,rejectinvite,getmygroup,getgroupdetails} = require("../controllers/groupcontroller")
 router.post("/new",verifytoken,creategroup)
 router.post("/invite",verifytoken,sendgroupinvite)
 router.get("/invite",verifytoken,getpendinginvites)
