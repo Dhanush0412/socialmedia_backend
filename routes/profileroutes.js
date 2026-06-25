@@ -1,7 +1,6 @@
 let express = require("express")
 let upload= require("../config/multer")
 let verifytoken=require("../middelware/auth")
-let multer=require("../middelware/upload")
 let router = express.Router();
 
 let {createprofile,getdashboard,updatedprofilepic,bioupdate,profileedit} = require("../controllers/profilecontroller");

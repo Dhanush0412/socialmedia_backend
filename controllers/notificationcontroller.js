@@ -29,7 +29,7 @@ let markasread = async(req,res)=>{
         if(!notification){
             return res.send("notification not found");
         }
-        if(String(notification.receiver)!== String(req.profileid)){
+        if(String(notification.receiverid)!== String(req.profileid)){
            return res.send("unauthorized");
          }
         notification.read = true;

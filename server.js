@@ -44,12 +44,7 @@ app.use(
  
 app.use(express.json());
  
- 
-// Static Files
- 
-app.use("/uploads",express.static("uploads"));
- 
- 
+
 // Routes
  
 app.use("/user",require("./routes/userroutes"));

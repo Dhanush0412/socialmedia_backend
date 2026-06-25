@@ -2,6 +2,7 @@ let Post = require("../models/post")
 let Profile = require("../models/profile")
 let User = require("../models/user")
 let Notification = require("../models/notification")
+let Comment = require("../models/comment")
 // post creation //
 
 let createpost = async(req,res)=>{
@@ -128,6 +129,97 @@ let unlike = async(req,res)=>{
     }
 }
 
+// adding comments method //
+
+let addcomment = async (req,res)=>{
+    try {
+        let profileid = req.profileid
+        let {postid} = req.params
+        let {text} = req.body
+
+        let profile = await Profile.findById(profileid)
+        if(!profile){
+            return res.send("profioe not found")
+        }
+        let post = await Post.findById(postid)
+        if(!post){
+            return res.send("post not found")
+        }
+        if(!text || text.trim() ==""){
+            return res.send("comment required to send")
+        }
+        let comment = new Comment({
+            text:text,
+            profile:profileid,
+            post:postid
+        })
+        await comment.save();       
+         if(post.profile.toString()!=profileid){
+            await Notification.create({
+                receiverid:post.profile,
+                senderid:profileid,
+                type:"comment",
+                message:"commented on your post"
+            })
+
+        }
+        let result = await Comment.findById(comment._id)
+        .populate({
+            path:"profile",
+            populate:{
+                path:"user"
+            }
+        })
+        return res.json(result)
+    } catch (error) {
+        console.log(error)
+        return res.send("internal error")
+    }
+}
+
+// getting comments //
+
+let getcomments = async(req,res)=>{
+    try {
+         let { postid } = req.params
+        let comments = await Comment.find({post:postid})
+        .populate({
+            path:"profile",
+            populate:{
+                path:"user"
+            }
+        })
+        .sort({
+            createdAt:-1
+        })
+        return res.json(comments)
+    } catch (error) {
+        console.log(error)
+        return res.send("internal error")
+    }
+}
+
+// deleting comment (post creater can delete) //
+
+let deletecomment = async(req,res)=>{
+    try {
+        let profileid = req.profileid
+        let {commentid} = req.params
+        let comment = await Comment.findById(commentid)
+        if(!comment){
+           return res.send("comment not found") 
+        }
+        if(comment.profile.toString() !== profileid){
+            return res.send("unauthorized")
+        }
+        await Comment.findByIdAndDelete(commentid)
+        return res.send("comment deleted")
+    } catch (error) {
+        console.log(error)
+        return res.send("intenal error")
+    }
+}
+
 // getting particular profile post //
 
 let getpost = async(req,res)=>{
@@ -200,4 +292,4 @@ let getpost = async(req,res)=>{
     }
 }
 
-module.exports= {createpost,getfeed,likes,unlike,getpost,getmyposts}
+module.exports= {createpost,getfeed,likes,unlike,addcomment,getcomments,deletecomment,getpost,getmyposts}

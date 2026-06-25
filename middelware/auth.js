@@ -24,5 +24,4 @@ let verify = async(req,res,next)=>{
         return res.send("internal error")
     }
 }
-
 module.exports=verify

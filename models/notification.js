@@ -18,7 +18,8 @@ let notificationschema = mongoose.Schema({
             "connectionrequest",
             "connectionaccepted",
             "groupinvite",
-            "like"
+            "like",
+            "comment"
         ],
         required:true
     },

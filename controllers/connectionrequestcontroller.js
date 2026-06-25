@@ -71,7 +71,7 @@ let pendingrequest = async(req,res)=>{
 
 let acceptrequest = async(req,res)=>{
     try {
-        let requestid = req.params;
+        let {requestid} = req.params;
         let request = await Connectionrequest.findById(requestid)
         if(!request){
             return res.send("request not found")
@@ -106,7 +106,7 @@ let acceptrequest = async(req,res)=>{
 // reject request //
  let rejectrequest = async(req,res)=>{
     try {
-        let requestid = req.params
+        let {requestid} = req.params
          let request = await Connectionrequest.findById(requestid)
         if(!request){
             return res.send("request not found")

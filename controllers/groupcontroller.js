@@ -15,6 +15,7 @@ let creategroup = async(req,res)=>{
         }
         let group = new Group({
             groupname:groupname,
+            groupimage:req.file.path,
             createdby:profileid,
             members:[profileid]
         })
