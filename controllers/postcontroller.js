@@ -209,7 +209,7 @@ let deletecomment = async(req,res)=>{
         if(!comment){
            return res.send("comment not found") 
         }
-        if(comment.profile.toString() !== profileid){
+        if(String(post.profile) !== String(profileid) && String(comment.profile) !== String(profileid)){
             return res.send("unauthorized")
         }
         await Comment.findByIdAndDelete(commentid)
