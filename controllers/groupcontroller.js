@@ -3,7 +3,7 @@ let Profile = require("../models/profile")
 let Groupinvite=require("../models/groupinvite")
 let Message = require("../models/message")
 let Notification = require("../models/notification")
-
+let Grouppic = "https://res.cloudinary.com/dubjosis9/image/upload/v1782723497/the-metropolitan-museum-of-art-eXVnyU2unms-unsplash_s5td03.jpg"
 // group creation method  //
 let creategroup = async(req,res)=>{
     try {
@@ -15,7 +15,10 @@ let creategroup = async(req,res)=>{
         }
         let group = new Group({
             groupname:groupname,
-            groupimage:req.file.path,
+            groupimage: 
+            req.file
+            ?
+            req.file.path:Grouppic,
             createdby:profileid,
             members:[profileid]
         })
@@ -33,7 +36,8 @@ let creategroup = async(req,res)=>{
 let sendgroupinvite =async(req,res)=>{
       try{
         let senderid= req.profileid
-        let {groupid,receiverid} = req.body;
+        let {groupid} = req.params
+        let {receiverid} = req.body;
 
         let group =await Group.findById(groupid);
 
@@ -42,7 +46,7 @@ let sendgroupinvite =async(req,res)=>{
             return res.send("group not found");
 
         }
-        if(senderid === receiverid){
+        if(String(senderid) === String(receiverid)){
             return res.send("cannot invite yourself");
          }
         
@@ -54,7 +58,7 @@ let sendgroupinvite =async(req,res)=>{
               return res.send("Cannot invite this user.");
              }
 
-        if(group.createdby.toString()!==senderid){
+        if(group.createdby.toString()!== String(senderid)){
            return res.send("only admin can invite");
          }
 
@@ -93,7 +97,6 @@ let sendgroupinvite =async(req,res)=>{
         console.log(error);
         return res.send("internal error");
     }
-
 }
 // get the pending request //
    let getpendinginvites =async(req,res)=>{

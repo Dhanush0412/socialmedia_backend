@@ -8,11 +8,11 @@ let Notification = require("../models/notification")
 let sendrequest = async (req,res)=>{
     try {
         let senderid = req.profileid;
-        let {receiverid}= req.body;
+        let {receiverid}= req.params;
         if(senderid == receiverid){
             return res.send("cannot send request to yourself")
         }
-
+         console.log(receiverid)
          let senderProfile = await Profile.findById(senderid);
          let receiverProfile = await Profile.findById(receiverid);
 
@@ -86,13 +86,19 @@ let acceptrequest = async(req,res)=>{
          if(String(request.receiver)!== String(req.profileid)){
            return res.send("unauthorized");
          }
+         if(request.status=="accepted"){
+            return res.send("you already accept the request")
+         }
+         if(request.status=="rejected"){
+            return res.send("already you rejected the request")
+         }
         request.status="accepted"
         await request.save();
         await Notification.create({
 
          receiverid:request.sender,
          senderid:request.receiver,
-         type:"connectionaccepted",
+         type:"connection accepted",
          message:"accepted your connection request"
          });
 
@@ -120,6 +126,9 @@ let acceptrequest = async(req,res)=>{
         }
          if(String(request.receiver)!== String(req.profileid)){
            return res.send("unauthorized");
+         }
+         if(request.status="accepted"){
+            return res.send("you already accept the code")
          }
         request.status="rejected"
         await request.save();
@@ -233,7 +242,6 @@ let blockedusers = async(req,res)=>{
         console.log(error);
         return res.send("internal error");
     }
-
 }
 
  module.exports={sendrequest,pendingrequest,acceptrequest,rejectrequest,getconnections,blockuser,unblockuser,blockedusers}
