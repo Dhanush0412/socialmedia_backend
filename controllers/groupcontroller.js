@@ -120,6 +120,7 @@ let sendgroupinvite =async(req,res)=>{
  // accept the group invites //
  let acceptinvite =async(req,res)=>{
     try{
+        let receiver = req.profileid
         let  {inviteid} =req.params;
         let invite =await Groupinvite.findById(inviteid);
         if(!invite){
@@ -132,7 +133,7 @@ let sendgroupinvite =async(req,res)=>{
         await invite.save();
         let group =await Group.findById(invite.group);
         let profile =await Profile.findById(invite.receiver);
-         if(String(invite.receiver)!== String(req.profileid)){
+         if(String(invite.receiver)!== String(receiver)){
            return res.send("unauthorized");
          }
         if(!group.members.includes(invite.receiver)){
@@ -253,10 +254,8 @@ let groupchatpreview = async(req,res)=>{
                     groupimage:"$group.groupimage",
                     latestMessage:1,
                     latestTime:1
-
                 }
             },
-
             {
                 $sort:{
                     latestTime:-1
@@ -292,5 +291,4 @@ let getgroupdetails = async(req,res)=>{
     }
 
 }
-
 module.exports={creategroup,sendgroupinvite,getpendinginvites,acceptinvite,rejectinvite,getmygroup,getgroupdetails};

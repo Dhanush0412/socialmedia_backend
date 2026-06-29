@@ -12,7 +12,6 @@ let sendrequest = async (req,res)=>{
         if(senderid == receiverid){
             return res.send("cannot send request to yourself")
         }
-         console.log(receiverid)
          let senderProfile = await Profile.findById(senderid);
          let receiverProfile = await Profile.findById(receiverid);
 
@@ -20,7 +19,9 @@ let sendrequest = async (req,res)=>{
             {
               return res.send("You cannot send a connection request.");
              }
-
+           if(senderProfile.connections.includes(receiverid)){
+            return res.send("you already connected with him")
+           }
         let requestexist = await Connectionrequest.findOne({
     $or:[
         {
@@ -98,7 +99,7 @@ let acceptrequest = async(req,res)=>{
 
          receiverid:request.sender,
          senderid:request.receiver,
-         type:"connection accepted",
+         type:"connectionaccepted",
          message:"accepted your connection request"
          });
 
