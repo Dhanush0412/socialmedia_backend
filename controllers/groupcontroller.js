@@ -37,7 +37,7 @@ let sendgroupinvite =async(req,res)=>{
       try{
         let senderid= req.profileid
         let {groupid} = req.params
-        let {receiverid} = req.body;
+        let {receiverid} = req.params;
 
         let group =await Group.findById(groupid);
 
@@ -49,14 +49,20 @@ let sendgroupinvite =async(req,res)=>{
         if(String(senderid) === String(receiverid)){
             return res.send("cannot invite yourself");
          }
-        
+         
+         console.log(senderid)
+         console.log(receiverid)
          let inviter = await Profile.findById(senderid);
          let invited = await Profile.findById(receiverid);
+         console.log(inviter)
+         console.log(invited)
           if (inviter.blockedusers.includes(receiverid) ||
               invited.blockedusers.includes(senderid))
              {
               return res.send("Cannot invite this user.");
              }
+             console.log(group.createdby.toString());
+             console.log(String(senderid))
 
         if(group.createdby.toString()!== String(senderid)){
            return res.send("only admin can invite");
