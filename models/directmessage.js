@@ -2,7 +2,7 @@ let mongoose = require("mongoose")
 
 let directmessageschema = mongoose.Schema({
     text:{
-        type:String
+        type:String,
     },
     sender:{
         type: mongoose.Schema.Types.ObjectId,

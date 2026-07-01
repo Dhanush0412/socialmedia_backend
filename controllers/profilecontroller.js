@@ -34,7 +34,7 @@ let createprofile = async(req,res)=>{
    }
    catch(error){
     console.log(error);
-    return res.send("internal error")
+    return res.status(500).send("internal error")
    }
 }
 

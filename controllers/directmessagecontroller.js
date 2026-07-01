@@ -1,7 +1,7 @@
 const { default: mongoose } = require("mongoose")
 let Directmessage=require("../models/directmessage")
 let socket = require("../socket/socket")
-
+let Profile = require("../models/profile")
 // sending direct message //
 let senddirectmessage = async(req,res)=>{
    try {
@@ -10,7 +10,9 @@ let senddirectmessage = async(req,res)=>{
        let {text} = req.body
        let sender = await Profile.findById(senderid);
        let receiver = await Profile.findById(receiverid);
-
+      if (!text || !text.trim()) {
+       return res.status(400).send("Message cannot be empty");
+       }
      if (sender.blockedusers.includes(receiverid) ||
          receiver.blockedusers.includes(senderid))
      {
@@ -27,9 +29,7 @@ let senddirectmessage = async(req,res)=>{
     .populate("receiver")
     
     socket.getIO()
-
    .to(receiverid)
-
     .emit(
     "receiveDirectMessage",
     populatedmessage
@@ -190,7 +190,6 @@ catch(error){
 let chatpreview = async(req,res)=>{
 try{
 let  profileid  = req.profileid;
-
 let result = await Directmessage.aggregate([
 {
     $match:{
@@ -253,7 +252,6 @@ let result = await Directmessage.aggregate([
 {
     $unwind:"$friend"
 },
-
 {
     $project:{
         friendid:"$friend._id",
@@ -262,13 +260,11 @@ let result = await Directmessage.aggregate([
         latestTime:1
     }
 },
-
 {
     $sort:{
         latestTime:-1
     }
 }
-
 ]);
 return res.json(result);
 }
@@ -276,8 +272,5 @@ catch(error){
   console.log(error);
   return res.status(500).send("internal error");
 }
-
 }
-
-
 module.exports={senddirectmessage,getdirectmessage,markmessagesread,unreadcount,getchatlist,chatpreview}

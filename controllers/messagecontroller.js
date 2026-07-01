@@ -7,7 +7,8 @@ let socket = require("../socket/socket")
 let sendmessage = async (req,res)=>{
     try {
         let senderid = req.profileid
-        let{text,groupid}= req.body
+        let {groupid} = req.params
+        let{text}= req.body
         let group = await Group.findById(groupid)
         if(!group){
             return res.status(404).send("group not found")
