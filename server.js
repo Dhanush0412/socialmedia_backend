@@ -56,6 +56,7 @@ app.use("/dmessage",require("./routes/directmessageroutes"));
 app.use("/connection",require("./routes/connectionrequestroutes"))
 app.use("/mainlist",require("./routes/chatroutes"))
 app.use("/notification",require("./routes/notificationroutes"))
+app.use("/activity",require("./routes/activityroutes"))
 
 // Socket Connection
  
@@ -98,7 +99,7 @@ io.on(
  
  
 // Start Server
- 
+
 const PORT =process.env.PORT;
 server.listen(
     PORT,
