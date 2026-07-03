@@ -1,15 +1,15 @@
 let mongoose = require("mongoose")
-
+let Profile = require("../models/profile")
 
 let notificationschema = mongoose.Schema({
     receiverid:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"profile",
+        ref:"Profile",
         required:true
     },
     senderid:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"profile",
+        ref:"Profile",
         required:true
     },
     type:{

@@ -143,4 +143,42 @@ let profileedit = async(req,res)=>{
     }
 }
 
-module.exports={createprofile,getdashboard,updatedprofilepic,bioupdate,profileedit};
+let updatetheme = async (req,res)=>{
+    try {
+        
+      let profileid = req.profileid
+      let {theme}= req.body
+      if(!theme){
+        return res.status(400).send("theme is required")
+      }
+      if(theme !== "light" && theme !=="dark"){
+        return res.status(400).send("invalid theme")
+      }
+      let profile = await Profile.findById(profileid)
+      if(!profile){
+        return res.status(404).send("profile not found")
+      }
+      profile.theme= theme
+      await profile.save()
+      return res.status(200).send("Theme Updated successfully")
+    } catch (error) {
+        console.log(error)
+        return res.status(500).send("internal error")
+    }
+}
+
+let gettheme = async (req,res)=>{
+    try {
+        let profileid = req.profileid
+        let profile = await Profile.findById(profileid).select("theme")
+        if(!profile){
+            return res.status(404).send("profile not found")
+        }
+        return res.json(profile)
+    } catch (error) {
+       console.log(error)
+       return res.status(500).send("internal error") 
+    }
+}
+
+module.exports={createprofile,getdashboard,updatedprofilepic,bioupdate,profileedit,updatetheme,gettheme};

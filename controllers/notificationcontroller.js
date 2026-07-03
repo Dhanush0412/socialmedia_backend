@@ -1,5 +1,5 @@
 let Notification = require("../models/notification")
-
+let Profile = require("../models/profile")
 // get notification method //
 let getnotifications = async(req,res)=>{
       try{
