@@ -8,13 +8,14 @@ let Comment = require("../models/comment")
 let createpost = async(req,res)=>{
     try {
         let profileid = req.profileid
-        let {caption}=req.body
+        let {caption,status="draft"}=req.body
         let profile = await Profile.findById(profileid)
         if(!profile){
             return res.status(404).send("profile not found")
         }      
         let post = new Post({
             caption:caption,
+            status:status,
             media:req.file?
             req.file.path:"",
             profile:profileid
@@ -40,7 +41,8 @@ let getfeed = async(req,res)=>{
                 $in:[...profile.connections,
                     profile._id
                 ]
-            }
+            },
+            status:"published"
         })
         .populate({
             path:"profile",
@@ -245,7 +247,8 @@ let getpost = async(req,res)=>{
             return res.status(404).send("profile not found")
         }
         let post = await Post.find({
-            profile:profile._id
+            profile:profile._id,
+            status:"published"
         })
         .populate({
             path:"profile",
@@ -292,4 +295,40 @@ let getpost = async(req,res)=>{
     }
 }
 
-module.exports= {createpost,getfeed,likes,unlike,addcomment,getcomments,deletecomment,getpost,getmyposts}
+// getting the draft posts //
+
+let getdraftposts = async(req,res)=>{
+    try{
+        let drafts = await Post.find({
+            createdby:req.profileid,
+            status:"draft"
+        });
+        return res.json(drafts);
+    }
+    catch(error){
+        console.log(error);
+        return res.status(500).send("Internal Error");
+    }
+}
+
+// publishing the drafted posts //
+let publishdraft = async(req,res)=>{
+    try{
+        let { postid } = req.params;
+        let post = await Post.findById(postid);
+        if(!post){
+            return res.status(404).send("Post not found");
+        }
+        if(String(post.createdby) !== String(req.profileid)){
+            return res.status(403).send("Unauthorized");
+        }
+        post.status = "published";
+        await post.save();
+        return res.status(200).send("Post published successfully");
+    }
+    catch(error){
+        console.log(error);
+        return res.status(500).send("Internal Error");
+    }
+}
+module.exports= {createpost,getfeed,likes,unlike,addcomment,getcomments,deletecomment,getpost,getmyposts,getdraftposts,publishdraft}

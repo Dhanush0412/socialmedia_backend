@@ -50,6 +50,7 @@ let sendrequest = async (req,res)=>{
          message:"sent you a connection request"
 
           });
+          
         return res.status(200).send("request sent")
 
     } catch (error) {
@@ -67,7 +68,14 @@ let pendingrequest = async(req,res)=>{
             receiver:profileid,
             status:"pending"
         })
-        .populate("sender")
+         .populate({
+            path:"sender",
+             select:"profilepic user",
+             populate:{
+              path:"user",
+             select:"username"
+              }
+           })
         return res.json(requests)
     } catch (error) {
         console.log(error)
@@ -128,8 +136,8 @@ let acceptrequest = async(req,res)=>{
          if(String(request.receiver)!== String(req.profileid)){
            return res.status(403).send("unauthorized");
          }
-         if(request.status="accepted"){
-            return res.status(429).send("you already accept the code")
+         if(request.status == "accepted"){
+            return res.status(429).send("you already accept")
          }
         request.status="rejected"
         await request.save();

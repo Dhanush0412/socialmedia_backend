@@ -15,7 +15,12 @@ let postSchema = mongoose.Schema({
     likes:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Profile"
-    }]
+    }],
+    status: {
+    type:String,
+    enum: ["draft", "published"],
+    default: "draft"
+     }
 },{
     timestamps:true
 })
