@@ -28,6 +28,7 @@ let createpost = async(req,res)=>{
     }
 }
 
+
 // post getting to the connected user //
 let getfeed = async(req,res)=>{
     try {
@@ -41,8 +42,7 @@ let getfeed = async(req,res)=>{
                 $in:[...profile.connections,
                     profile._id
                 ]
-            },
-            status:"published"
+            }
         })
         .populate({
             path:"profile",
