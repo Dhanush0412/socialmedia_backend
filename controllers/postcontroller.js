@@ -295,40 +295,4 @@ let getpost = async(req,res)=>{
     }
 }
 
-// getting the draft posts //
-
-let getdraftposts = async(req,res)=>{
-    try{
-        let drafts = await Post.find({
-            createdby:req.profileid,
-            status:"draft"
-        });
-        return res.json(drafts);
-    }
-    catch(error){
-        console.log(error);
-        return res.status(500).send("Internal Error");
-    }
-}
-
-// publishing the drafted posts //
-let publishdraft = async(req,res)=>{
-    try{
-        let { postid } = req.params;
-        let post = await Post.findById(postid);
-        if(!post){
-            return res.status(404).send("Post not found");
-        }
-        if(String(post.createdby) !== String(req.profileid)){
-            return res.status(403).send("Unauthorized");
-        }
-        post.status = "published";
-        await post.save();
-        return res.status(200).send("Post published successfully");
-    }
-    catch(error){
-        console.log(error);
-        return res.status(500).send("Internal Error");
-    }
-}
-module.exports= {createpost,getfeed,likes,unlike,addcomment,getcomments,deletecomment,getpost,getmyposts,getdraftposts,publishdraft}
+module.exports= {createpost,getfeed,likes,unlike,addcomment,getcomments,deletecomment,getpost,getmyposts}
