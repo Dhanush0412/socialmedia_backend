@@ -19,8 +19,7 @@ const io = new Server(server, {
         credentials: true
     }
 });
- 
- 
+
 const socket = require("./socket/socket");
  
 socket.init(io);
