@@ -2,6 +2,7 @@ const { default: mongoose } = require("mongoose")
 let Directmessage=require("../models/directmessage")
 let socket = require("../socket/socket")
 let Profile = require("../models/profile")
+let User = require("../models/user")
 // sending direct message //
 let senddirectmessage = async(req,res)=>{
    try {
@@ -25,8 +26,20 @@ let senddirectmessage = async(req,res)=>{
     })
     await message.save()
     let populatedmessage = await Directmessage.findById(message._id)
-    .populate("sender")
-    .populate("receiver")
+    .populate({
+    path: "sender",
+    populate: {
+        path: "user",
+        select: "username"
+    }
+     })
+     .populate({
+    path: "receiver",
+    populate: {
+        path: "user",
+        select: "username"
+    }
+});
     
     socket.getIO()
    .to(receiverid)
@@ -59,12 +72,18 @@ let getdirectmessage = async(req,res)=>{
         ]
 
     })
-    .populate("sender")
-    .populate("receiver")
+    let chatUser = await Profile.findById(receiverid)
+     .populate({
+    path: "user",
+    select: "username"
+     })
     .sort({
         createdAt:-1
     })
-    return res.json(message)
+    return res.json({
+    chatUser,
+    messages: message
+});
    } catch (error) {
     console.log(error)
     return res.status(500).send("internal error")
