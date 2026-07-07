@@ -8,7 +8,11 @@ let Grouppic = "https://res.cloudinary.com/dubjosis9/image/upload/v1782723497/th
 let creategroup = async(req,res)=>{
     try {
         let profileid=req.profileid
-        let {groupname}=req.body
+        let groupname = req.body?.groupname;
+
+        if (!groupname) {
+         return res.status(400).send("Group name is required");
+           }
         let profile = await Profile.findById(profileid)
         if(!profile){
             return res.status(404).send("profile not found")

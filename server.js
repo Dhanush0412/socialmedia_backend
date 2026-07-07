@@ -82,11 +82,8 @@ io.on(
          } catch (error) {
             console.log(error)
          }
- 
             }
         );
- 
- 
         socket.on("disconnect",()=>{
            console.log("User disconnected:",socket.id);
  
