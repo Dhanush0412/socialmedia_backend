@@ -1,4 +1,4 @@
-
+let bcrypt = require("bcrypt")
 let Profile = require("../models/profile")
 let User = require("../models/user")
 let Post = require("../models/post")
@@ -180,5 +180,64 @@ let gettheme = async (req,res)=>{
        return res.status(500).send("internal error") 
     }
 }
+let changepassword = async (req, res) => {
+    try {
+        let profileid = req.profileid;
+        let {currentpassword,newpassword,confirmpassword} = req.body;
+        if (!currentpassword || !newpassword || !confirmpassword) {
+            return res.status(400).send("All fields are required");
+        }
+        if (newpassword.length < 8) {
+            return res.status(400).send("Password must be at least 8 characters long");
+        }
+        const strongPassword =/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!strongPassword.test(newpassword)) {
+            return res.status(400).send(
+                "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character."
+                 );
+        }
+        if (newpassword !== confirmpassword) {
+            return res.status(400).send("Password mismatch");
+        }
+        let profile = await Profile.findById(profileid)
+            .populate("user");
+        if (!profile) {
+            return res.status(404).send("Profile not found");
+        }
+        let user = profile.user;
+        let isCurrentPasswordCorrect = await bcrypt.compare(
+            currentpassword,
+            user.password
+        );
 
-module.exports={createprofile,getdashboard,updatedprofilepic,bioupdate,profileedit,updatetheme,gettheme};
+        if (!isCurrentPasswordCorrect) {
+            return res.status(400).send("Current password is incorrect");
+        }
+
+        let isSamePassword = await bcrypt.compare(
+            newpassword,
+            user.password
+        );
+
+        if (isSamePassword) {
+            return res.status(400).send(
+                "New password cannot be the same as your current password"
+            );
+        }
+
+        let hashedPassword = await bcrypt.hash(
+            newpassword,
+            10
+        );
+        user.password = hashedPassword;
+        await user.save();
+        return res.status(200).send("Password updated successfully");
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send("Internal server error");
+    }
+};
+
+
+
+module.exports={createprofile,getdashboard,updatedprofilepic,bioupdate,profileedit,updatetheme,gettheme,changepassword};
