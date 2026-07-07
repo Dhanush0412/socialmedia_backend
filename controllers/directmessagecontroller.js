@@ -39,14 +39,19 @@ let senddirectmessage = async(req,res)=>{
         path: "user",
         select: "username"
     }
-});
-    
-    socket.getIO()
-   .to(receiverid)
-    .emit(
-    "receiveDirectMessage",
-    populatedmessage
-     );
+});    
+    const unread = await Directmessage.countDocuments({
+                         sender: senderid,
+                         receiver: receiverid,
+                         isRead: false
+                          });
+
+     socket.getIO()
+    .to(receiverid)
+       .emit("unreadUpdated", {
+          sender: senderid,
+           unreadCount: unread
+        });
     return res.json(populatedmessage)
    } catch (error) {
       console.log(error)

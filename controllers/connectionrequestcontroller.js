@@ -36,6 +36,21 @@ let sendrequest = async (req,res)=>{
 
       });
         if(requestexist){
+
+            if(requestexist.status=="rejected"){
+                 let request = new Connectionrequest({
+                   sender:senderid,
+                   receiver:receiverid
+             })
+              await request.save();
+              await Notification.create({
+              receiverid:receiverid,
+              senderid:senderid,
+              type:"connectionrequest",
+              message:"sent you a connection request"
+          });
+            return res.status(200).send("request sent")
+            }
             return res.status(429).send("already request sent")
         }
         let request = new Connectionrequest({
