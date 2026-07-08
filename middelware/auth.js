@@ -1,11 +1,18 @@
 let jwt= require("jsonwebtoken")
 let Profile = require("../models/profile")
+let BlacklistToken = require("../models/blacklisttoken")
 let verify = async(req,res,next)=>{
     try {
         let token= req.headers.authorization.split(" ")[1];
         if(!token){
             return res.send("token required")
         }
+       let blacklisted =await BlacklistToken.findOne({token});
+        if(blacklisted){
+          return res.status(401).send(
+        "Session expired. Login again."
+    );
+}
         let decode = jwt.verify(
             token,
             process.env.JWT_SECRET

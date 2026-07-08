@@ -56,6 +56,7 @@ app.use("/connection",require("./routes/connectionrequestroutes"))
 app.use("/mainlist",require("./routes/chatroutes"))
 app.use("/notification",require("./routes/notificationroutes"))
 app.use("/activity",require("./routes/activityroutes"))
+app.use("/exit",require("./routes/blacklisttokenroutes"))
 
 // Socket Connection
  
@@ -92,8 +93,8 @@ io.on(
  
     }
 );
- 
- 
+
+
 // Start Server
 
 const PORT =process.env.PORT;
