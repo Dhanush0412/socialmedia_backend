@@ -45,10 +45,15 @@ let senddirectmessage = async(req,res)=>{
                          receiver: receiverid,
                          isRead: false
                           });
-
      socket.getIO()
-    .to(receiverid)
-       .emit("unreadUpdated", {
+     .to(receiverid)
+      .emit(
+        "receiveDirectMessage",
+         populatedmessage
+        );
+     socket.getIO()
+        .to(receiverid)
+        .emit("unreadUpdated", {
           sender: senderid,
            unreadCount: unread
         });
