@@ -86,4 +86,30 @@ let deletemessage = async(req,res)=>{
         return res.status(500).send("Internal error")
     }
 }
-module.exports={sendmessage,getgroupmessage,deletemessage}
+
+let editmessage = async(req,res)=>{
+    try {
+        let sender = req.profileid
+        let {groupid,messageid} = req.params
+        let {editedmessage} = req.body
+        let group = await Group.findById(groupid)
+        let message = await Message.findById(messageid)
+        if(!group){
+            return res.status(404).send("group not found")
+        }
+        if(!message){
+            return res.staus(404).send("message not found")
+        }
+
+        if(String(sender) !== String(message.sender)){
+            return res.status(401).send("you can't edit this message")
+        }
+        message.text = String(editedmessage)
+        await message.save()
+        return res.json(message.text)
+    } catch (error) {
+        console.log(error)
+        return res.status(500).send("Internal error")
+    }
+}
+module.exports={sendmessage,getgroupmessage,deletemessage,editmessage}
