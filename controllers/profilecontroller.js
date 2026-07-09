@@ -238,6 +238,21 @@ let changepassword = async (req, res) => {
     }
 };
 
+let deleteaccount = async(req,res)=>{
+    try {
+        let profileid = req.profileid
+        let profile = await Profile.findById(profileid)
+        if(!profile){
+            return res.status(404).send("profile not found")
+        }
+        let userid = profile.user
+        await User.findByIdAndDelete(userid)
+        await Profile.findByIdAndDelete(profileid)
+        return res.status(200).send("Successfully Account Deleted")
+    } catch (error) {
+        console.log(error)
+        return res.status(500).send("Internal error")
+    }
+}
 
-
-module.exports={createprofile,getdashboard,updatedprofilepic,bioupdate,profileedit,updatetheme,gettheme,changepassword};
+module.exports={createprofile,getdashboard,updatedprofilepic,bioupdate,profileedit,updatetheme,gettheme,changepassword,deleteaccount};

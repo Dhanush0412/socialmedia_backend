@@ -323,4 +323,25 @@ let deletemessage = async(req,res)=>{
         return res.status(500).send("Internal error")
     }
 }
-module.exports={senddirectmessage,getdirectmessage,markmessagesread,unreadcount,getchatlist,chatpreview,deletemessage}
+
+let editmessage = async(req,res)=>{
+    try {
+        let senderid = req.profileid
+        let {dmessageid} = req.params
+        let {editedmessage} = req.body
+        let message = await Directmessage.findById(dmessageid)
+        if(!message){
+            return res.status(404).send("message not found")
+        }
+        if(String(senderid) !== String(message.sender)){
+            return res.status(401).send("you can't edit it")
+        }
+        message.text = String(editedmessage)
+        await message.save()
+         return res.json(message.text);
+    } catch (error) {
+        console.log(error)
+        return res.status(500).send("Internal error")
+    }
+}
+module.exports={senddirectmessage,getdirectmessage,markmessagesread,unreadcount,getchatlist,chatpreview,deletemessage,editmessage}
