@@ -63,5 +63,27 @@ let getgroupmessage = async(req,res)=>{
     }
 
 }
-
-module.exports={sendmessage,getgroupmessage}
+let deletemessage = async(req,res)=>{
+    try {
+        let senderid = req.profileid
+        let {groupid,messageid} = req.params
+         let group = await Group.findById(groupid)
+         if(!group){
+            return res.status(404).send("group not found")
+         }
+        let message = await Message.findById(messageid)
+        if(!message){
+            return res.status(404).send("message not found")
+        }
+        let groupadmin = group.createdby
+        if(String(message.sender) !== String(senderid) && String(group.createdby) !== String(groupadmin)){
+            return res.status(401).send("you can't delete the message")
+        }
+        await Message.findByIdAndDelete(message)
+        return res.status(200).send("message was deleted")
+    } catch (error) {
+        console.log(error)
+        return res.status(500).send("Internal error")
+    }
+}
+module.exports={sendmessage,getgroupmessage,deletemessage}

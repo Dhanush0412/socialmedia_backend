@@ -302,4 +302,25 @@ catch(error){
   return res.status(500).send("internal error");
 }
 }
-module.exports={senddirectmessage,getdirectmessage,markmessagesread,unreadcount,getchatlist,chatpreview}
+
+
+// deleting direct message //
+let deletemessage = async(req,res)=>{
+    try {
+        let sender = req.profileid
+        let {directmessageid} = req.params
+        let dmessage = await Directmessage.findById(directmessageid)
+        if(!dmessage){
+            return res.status(404).send("message not found")
+        }
+        if(String(dmessage.sender) !== String(sender) && String(dmessage.receiver) !== String(sender)){
+            return res.status(401).send("you can't delete the message")
+        }
+        await Directmessage.findByIdAndDelete(directmessageid)
+        return res.status(200).send("message deleted")
+    } catch (error) {
+        console.log(error)
+        return res.status(500).send("Internal error")
+    }
+}
+module.exports={senddirectmessage,getdirectmessage,markmessagesread,unreadcount,getchatlist,chatpreview,deletemessage}
