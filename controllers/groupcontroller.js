@@ -290,4 +290,72 @@ let getgroupdetails = async(req,res)=>{
     }
 
 }
-module.exports={creategroup,sendgroupinvite,getpendinginvites,acceptinvite,rejectinvite,getmygroup,getgroupdetails};
+
+// members can exit the group //
+let groupexit = async (req,res)=>{
+    try {
+        let member = req.profileid;
+        let { groupid } = req.params;
+        let profile = await Profile.findById(member);
+        if(!profile){
+            return res.status(404)
+            .send("profile not found");
+        }
+        let group = await Group.findById(groupid);
+        if(!group){
+            return res.status(404)
+            .send("group not found");
+        }
+        const isMember = group.members.some(
+            m => String(m) === String(member)
+        );
+        if(!isMember){
+            return res.status(401).send("you are not in the group");
+        }
+
+        const isAdmin =
+            String(group.createdby) ===
+            String(member);
+
+        if(isAdmin){
+            if(group.members.length === 1){
+                await Group.findByIdAndDelete(
+                    groupid
+                );
+                await Profile.findByIdAndUpdate(
+                    member,
+                    {
+                        $pull:{
+                            groups:groupid
+                        }
+                    }
+                );
+
+                return res.status(200).send("group deleted");
+            }
+            const newAdmin =
+                group.members.find(
+                    m =>
+                    String(m) !==
+                    String(member)
+                );
+            group.createdby = newAdmin;
+        }
+        group.members.pull(member);
+        await group.save();
+        await Profile.findByIdAndUpdate(
+            member,
+            {
+                $pull:{
+                    groups:groupid
+                }
+            }
+        );
+
+        return res.status(200).send("successfully exited group");
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send("Internal error");
+    }
+}
+module.exports={creategroup,sendgroupinvite,getpendinginvites,acceptinvite,rejectinvite,getmygroup,getgroupdetails,groupexit};
