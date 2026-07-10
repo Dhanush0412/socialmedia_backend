@@ -14,6 +14,12 @@ let senddirectmessage = async(req,res)=>{
       if (!text || !text.trim()) {
        return res.status(400).send("Message cannot be empty");
        }
+       if(!sender){
+        return res.status(404).send("sender not found")
+       }
+       if(!receiver){
+        return res.status(404).send("receiver not found")
+       }
      if (sender.blockedusers.includes(receiverid) ||
          receiver.blockedusers.includes(senderid))
      {
@@ -328,7 +334,7 @@ let editmessage = async(req,res)=>{
     try {
         let senderid = req.profileid
         let {dmessageid} = req.params
-        let {editedmessage} = req.body
+        let {text} = req.body
         let message = await Directmessage.findById(dmessageid)
         if(!message){
             return res.status(404).send("message not found")
@@ -336,7 +342,7 @@ let editmessage = async(req,res)=>{
         if(String(senderid) !== String(message.sender)){
             return res.status(401).send("you can't edit it")
         }
-        message.text = String(editedmessage)
+        message.text = String(text)
         await message.save()
          return res.json(message.text);
     } catch (error) {

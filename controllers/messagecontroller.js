@@ -93,7 +93,7 @@ let editmessage = async(req,res)=>{
     try {
         let sender = req.profileid
         let {groupid,messageid} = req.params
-        let {editedmessage} = req.body
+        let {text} = req.body
         let group = await Group.findById(groupid)
         let message = await Message.findById(messageid)
         if(!group){
@@ -106,7 +106,7 @@ let editmessage = async(req,res)=>{
         if(String(sender) !== String(message.sender)){
             return res.status(401).send("you can't edit this message")
         }
-        message.text = String(editedmessage)
+        message.text = String(text)
         await message.save()
         return res.json(message.text)
     } catch (error) {
