@@ -29,24 +29,38 @@ let updatedactivity = async(req,res)=>{
         return res.status(500).send("internal error")
     }
 }
-let getactivity = async(req,res)=>{
-    try{
+
+let getactivity = async (req, res) => {
+    try {
         let profileid = req.profileid;
-        let today = new Date().toISOString().split("T")[0];
-        let activity = await Activity.findOne({
-            profile:profileid,
-            date:today
+        let activity = await Activity.find({
+            profile: profileid
+        })
+        .sort({
+            date: -1
         });
-        if(!activity){
-            return res.json({
-                totalSeconds:0
-            });
+        if (activity.length === 0) {
+            return res.json([]);
         }
-        return res.json(activity);
-    }
-    catch(error){
+        let result = activity.map(item => {
+            let hours = Math.floor(
+                item.totalseconds / 3600
+            );
+            let minutes = Math.floor(
+                (item.totalseconds % 3600) / 60
+            );
+            return {
+                date: new Date(item.date)
+                    .toLocaleDateString("en-GB"),
+                duration: `${hours}h ${minutes}m`,
+                totalSeconds: item.totalseconds
+            };
+        });
+
+        return res.json(result);
+    } catch (error) {
         console.log(error);
         return res.status(500).send("Internal Error");
     }
-}
+};
 module.exports={updatedactivity,getactivity}

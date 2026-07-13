@@ -24,13 +24,9 @@ let ProfileSchema = mongoose.Schema({
     blockedusers:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Profile"
-    }],
-    theme:[{
-        type:String,
-        enum:["light","dark"],
-        default:"light"
     }]
-})
+   
+ })
 let Profile = mongoose.model(
     "Profile",
     ProfileSchema
