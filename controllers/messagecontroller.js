@@ -26,7 +26,13 @@ let sendmessage = async (req,res)=>{
          })
          await message.save()
          let populatemessage = await Message.findById(message._id)
-         .populate("sender")
+         .populate({
+            path:"sender",
+            populate:{
+                path:"user",
+                select:"username"
+            }
+         })
          .populate("group")
          socket.getIO()
          .to(groupid)
@@ -51,11 +57,18 @@ let getgroupmessage = async(req,res)=>{
         if(!group.members.includes(profileid)){
             return res.status(401).send("access denied");
         }
-        let messages =await Message.find({group:groupid})
-        .populate("sender")
-        .populate("group")
-        .sort({createdAt:1});
-        return res.json(messages);
+       let messages = await Message.find({
+         group: groupid
+           })
+          .populate("sender")
+           .populate(
+                "group",
+                "groupname groupimage createdby"
+            )
+          .sort({
+             createdAt: 1
+            });
+            return res.json(messages);
     }
     catch(error){
         console.log(error);
@@ -79,7 +92,7 @@ let deletemessage = async(req,res)=>{
         if(String(message.sender) !== String(senderid) && String(group.createdby) !== String(groupadmin)){
             return res.status(401).send("you can't delete the message")
         }
-        await Message.findByIdAndDelete(message)
+        await Message.findByIdAndDelete(messageid)
         return res.status(200).send("message was deleted")
     } catch (error) {
         console.log(error)
@@ -100,7 +113,7 @@ let editmessage = async(req,res)=>{
             return res.status(404).send("group not found")
         }
         if(!message){
-            return res.staus(404).send("message not found")
+            return res.status(404).send("message not found")
         }
 
         if(String(sender) !== String(message.sender)){
