@@ -21,9 +21,7 @@ const io = new Server(server, {
 });
 
 const socket = require("./socket/socket");
- 
 socket.init(io);
- 
  
 // Middlewares
  

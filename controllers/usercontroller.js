@@ -302,29 +302,49 @@ let verifyforgototp = async(req,res)=>{
         console.log(error);
         return res.status(500).send("Internal error");
     }
-
 }
 // search any user //
-let searchuser = async(req,res)=>{
+let searchuser = async (req, res) => {
     try {
-        let {username} = req.query;
-        let profile = await Profile.find()
-        .populate("user");
-        if(!username){
-       return res.status(400).send("Username is required");
-       }
-        let result = profile.filter(profile=>
-        profile.user &&
-        profile.user.username
-        .toLowerCase().includes(username.toLowerCase())
-        );
-        return res.json(result);
-    } 
-    catch (error) {
-        console.log(error)
-        return res.status(500).send("internal error")
+        let profileid = req.profileid;
+        let { username } = req.query;
+        if (!username) {
+            return res.status(400).send("Username is required");
+        }
+        let myProfile =await Profile.findById(profileid);
+        if (!myProfile) {
+            return res.status(404).send("Profile not found");
+        }
+
+        let profiles =await Profile.find()
+            .populate("user");
+        let result =
+            profiles.filter(profile =>
+                profile.user &&
+                profile.user.username
+                    .toLowerCase()
+                    .includes(
+                        username.toLowerCase()
+                    ) &&
+
+                // don't show yourself
+                String(profile._id) !== String(profileid) &&
+
+                // don't show connected users
+                !myProfile.connections.some(
+                    id => String(id) === String(profile._id)
+                )
+            );
+
+          return res.json(result);
+
+    } catch (error) {
+        console.log(error);
+        return res
+            .status(500)
+            .send("Internal error");
     }
-}
+};
 
 
 module.exports = {signup,login,forgotpassword,sendotp,verifyotp,searchuser,sendforgototp,verifyforgototp};

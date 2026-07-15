@@ -10,5 +10,5 @@ router.post("/sentotp",sendotp)
 router.post("/verifyotp",verifyotp)
 router.post("/sendforgototp",sendforgototp)
 router.post("/verifyforgototp",verifyforgototp)
-router.get("/search",searchuser)
+router.get("/search",verifytoken,searchuser)
 module.exports=router;
