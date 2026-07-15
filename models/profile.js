@@ -7,7 +7,7 @@ let ProfileSchema = mongoose.Schema({
     },
     bio:{
         type: String,
-        maxlength:50
+        maxlength:500
     },
     profilepic:{
        type:String,

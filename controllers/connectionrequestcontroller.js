@@ -156,6 +156,12 @@ let acceptrequest = async(req,res)=>{
          }
         request.status="rejected"
         await request.save();
+        await Notification.create({
+            receiverid: request.sender,
+            senderid: request.receiver,
+            type: "connectionrejected",
+            message: "rejected your connection request"
+         });
         return res.status(200).send("request rejected")
     } catch (error) {
         console.log(error)

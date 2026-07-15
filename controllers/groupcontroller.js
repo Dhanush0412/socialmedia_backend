@@ -168,6 +168,12 @@ let rejectinvite = async(req,res)=>{
          }
         invite.status="rejected"
         await invite.save();
+         await Notification.create({
+              receiverid: invite.sender,
+              senderid: invite.receiver,
+              type: "grouprejected",
+              message: "rejected your group invitation"
+             });
         return res.status(200).send("invite rejected")
     } catch (error) {
         console.log(error)
@@ -358,4 +364,84 @@ let groupexit = async (req,res)=>{
         return res.status(500).send("Internal error");
     }
 }
-module.exports={creategroup,sendgroupinvite,getpendinginvites,acceptinvite,rejectinvite,getmygroup,getgroupdetails,groupexit};
+
+let searchConnectedUsers = async (req, res) => {
+    try {
+        let profileid = req.profileid;
+        let { username } = req.query;
+        if (!username) {
+            return res.status(400).send("Username is required");
+        }
+        let profile =await Profile.findById(profileid);
+        if (!profile) {
+            return res.status(404).send("Profile not found");
+        }
+        let result =await Profile.find({
+                 _id: {
+                    $in:
+                    profile.connections
+                   }
+              })
+            .populate({
+                path: "user",
+                match: {
+                    username: {
+                        $regex:
+                            username,
+                        $options:
+                            "i"
+                    }
+                }
+            });
+        result = result.filter(
+            p => p.user
+        );
+        return res.json(result);
+    } catch (error) {
+        console.log(error);
+        return res
+            .status(500)
+            .send(
+                "Internal error"
+            );
+    }
+};
+let getRejectedInvites = async (req, res) => {
+    try {
+        let profileid = req.profileid;
+        let { groupid } = req.params;
+
+        let group = await Group.findById(groupid);
+
+        if (!group) {
+            return res
+                .status(404)
+                .send("Group not found");
+        }
+        if (
+            String(group.createdby) !==String(profileid)) {
+            return res.status(401).send("Only admin can view rejected invites");
+        }
+      let rejectedInvites = await Groupinvite.find({
+        group: groupid,
+        status: "rejected"
+       })
+      .populate({
+        path: "receiver",
+        select: "profilepic bio user",
+        populate: {
+        path: "user",
+        select: "username"
+       }
+     })
+       .sort({
+          updatedAt: -1
+         });
+         return res.json(rejectedInvites);
+    } 
+    catch (error) {
+        console.log(error);
+        return res.status(500).send("Internal error");
+    }
+};
+module.exports={creategroup,sendgroupinvite,getpendinginvites,acceptinvite,rejectinvite,getmygroup,getgroupdetails,groupexit,searchConnectedUsers,getRejectedInvites};

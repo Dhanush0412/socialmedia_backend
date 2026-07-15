@@ -8,7 +8,7 @@ let Comment = require("../models/comment")
 let createpost = async(req,res)=>{
     try {
         let profileid = req.profileid
-        let {caption,status="draft"}=req.body
+        let {caption}=req.body
         let profile = await Profile.findById(profileid)
         if(!profile){
             return res.status(404).send("profile not found")

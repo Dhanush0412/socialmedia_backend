@@ -34,6 +34,7 @@ let sendmessage = async (req,res)=>{
             }
          })
          .populate("group")
+         
          socket.getIO()
          .to(groupid)
          .emit("receivemessage",populatemessage)

@@ -5,7 +5,12 @@ let getnotifications = async(req,res)=>{
       try{
         let  profileid  = req.profileid;
         let notifications =await Notification.find({receiverid:profileid})
-        .populate("senderid")
+        .populate({
+           path: "senderid",
+           populate: {
+           path: "user"
+           }
+        })
         .sort({
             createdAt:-1
         });
