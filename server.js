@@ -58,42 +58,6 @@ app.use("/notification",require("./routes/notificationroutes"))
 app.use("/activity",require("./routes/activityroutes"))
 app.use("/exit",require("./routes/blacklisttokenroutes"))
 
-// Socket Connection
- 
-io.on(
-    "connection",
-    (socket)=>{
-        console.log("User connected:",socket.id);
-        socket.on("joingroup",
-            (groupid)=>{
-               try {
-                 socket.join(groupid);
-                console.log("Joined group:",groupid);
-               } catch (error) {
-                console.log(error);
-               }
- 
-            }
-        );
- 
-        socket.on("joinprofile",(profileid)=>{
-         try {
-            socket.join(profileid);
-            console.log("Joined profile:",profileid);
-         } catch (error) {
-            console.log(error)
-         }
-            }
-        );
-        socket.on("disconnect",()=>{
-           console.log("User disconnected:",socket.id);
- 
-            }
-        );
- 
-    }
-);
-
 
 // Start Server
 

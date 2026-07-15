@@ -15,7 +15,6 @@ let createpost = async(req,res)=>{
         }      
         let post = new Post({
             caption:caption,
-            status:status,
             media:req.file?
             req.file.path:"",
             profile:profileid
