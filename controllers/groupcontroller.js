@@ -74,6 +74,9 @@ let sendgroupinvite =async(req,res)=>{
             receiver:receiverid,
             status:"pending"
         });
+        if(group.members.includes(receiverid)){
+            return res.status(429).send("user all ready exist in the group")
+        }
         if(existingInvite){
             return res.status(429).send("invite already sent");
         }
@@ -368,7 +371,12 @@ let groupexit = async (req,res)=>{
 let searchConnectedUsers = async (req, res) => {
     try {
         let profileid = req.profileid;
+        let {groupid} = req.params;
         let { username } = req.query;
+        let group = await Group.findById(groupid)
+        if(!group){
+            return res.status(404).send("group not found")
+        }
         if (!username) {
             return res.status(400).send("Username is required");
         }
@@ -379,7 +387,8 @@ let searchConnectedUsers = async (req, res) => {
         let result =await Profile.find({
                  _id: {
                     $in:
-                    profile.connections
+                    profile.connections,
+                    $nin: group.members
                    }
               })
             .populate({
@@ -400,19 +409,14 @@ let searchConnectedUsers = async (req, res) => {
     } catch (error) {
         console.log(error);
         return res
-            .status(500)
-            .send(
-                "Internal error"
-            );
+            .status(500).send("Internal error");
     }
 };
 let getRejectedInvites = async (req, res) => {
     try {
         let profileid = req.profileid;
         let { groupid } = req.params;
-
         let group = await Group.findById(groupid);
-
         if (!group) {
             return res
                 .status(404)
