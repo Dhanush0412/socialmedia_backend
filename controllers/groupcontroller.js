@@ -110,7 +110,14 @@ let sendgroupinvite =async(req,res)=>{
             status:"pending"
         })
         .populate("group")
-        .populate("sender");
+        .populate({
+         path: "sender",
+         select: "profilepic user",
+         populate: {
+         path: "user",
+         select: "username"
+         }
+        });
         return res.json(invites);
     }
     catch(error){
@@ -408,8 +415,7 @@ let searchConnectedUsers = async (req, res) => {
         return res.json(result);
     } catch (error) {
         console.log(error);
-        return res
-            .status(500).send("Internal error");
+        return res.status(500).send("Internal error");
     }
 };
 // reject invites //
@@ -419,9 +425,7 @@ let getRejectedInvites = async (req, res) => {
         let { groupid } = req.params;
         let group = await Group.findById(groupid);
         if (!group) {
-            return res
-                .status(404)
-                .send("Group not found");
+            return res.status(404).send("Group not found");
         }
         if (
             String(group.createdby) !==String(profileid)) {
