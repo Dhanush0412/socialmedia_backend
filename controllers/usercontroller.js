@@ -117,9 +117,10 @@ let login = async(req,res)=>{
     profile ?
     profile._id:null
 
-});
+    });
 
-  } catch (error) {
+  }
+   catch (error) {
     return res.status(500).send("internal error")
   }
 }
@@ -254,7 +255,6 @@ let sendforgototp = async(req,res)=>{
 
         })
         await Otp.create({ email,otp,verified:false,expiresAt:new Date(Date.now() + 5*60*1000)
-
      });
         return res.status(200).send("OTP sent successfully");
     } catch (error) {
@@ -262,10 +262,9 @@ let sendforgototp = async(req,res)=>{
         return res.status(500).send("internal error")
     }
 }
+// verify forgot password //
 let verifyforgototp = async(req,res)=>{
-
     try{
-
         let {login,otp}=req.body;
         let user = await User.findOne({
             $or:[
@@ -315,34 +314,22 @@ let searchuser = async (req, res) => {
         if (!myProfile) {
             return res.status(404).send("Profile not found");
         }
-
         let profiles =await Profile.find()
-            .populate("user");
-        let result =
-            profiles.filter(profile =>
+        .populate("user");
+        let result = profiles.filter(profile =>
                 profile.user &&
                 profile.user.username
                     .toLowerCase()
-                    .includes(
-                        username.toLowerCase()
-                    ) &&
-
-                // don't show yourself
+                    .includes(username.toLowerCase()) &&
                 String(profile._id) !== String(profileid) &&
-
-                // don't show connected users
                 !myProfile.connections.some(
                     id => String(id) === String(profile._id)
                 )
             );
-
           return res.json(result);
-
     } catch (error) {
         console.log(error);
-        return res
-            .status(500)
-            .send("Internal error");
+        return res.status(500).send("Internal error");
     }
 };
 

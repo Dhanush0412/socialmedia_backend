@@ -329,7 +329,7 @@ let deletemessage = async(req,res)=>{
         return res.status(500).send("Internal error")
     }
 }
-
+// edit message in this method message owner can delete the message //
 let editmessage = async(req,res)=>{
     try {
         let senderid = req.profileid

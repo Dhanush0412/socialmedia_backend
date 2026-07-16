@@ -367,7 +367,7 @@ let groupexit = async (req,res)=>{
         return res.status(500).send("Internal error");
     }
 }
-
+// searchconnectedusers means in group invite shows only connected user and not display exsisting members in group //
 let searchConnectedUsers = async (req, res) => {
     try {
         let profileid = req.profileid;
@@ -412,6 +412,7 @@ let searchConnectedUsers = async (req, res) => {
             .status(500).send("Internal error");
     }
 };
+// reject invites //
 let getRejectedInvites = async (req, res) => {
     try {
         let profileid = req.profileid;

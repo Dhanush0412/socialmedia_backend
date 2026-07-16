@@ -1,5 +1,6 @@
 let Activity = require("../models/activity")
 
+// update activity //
 let updatedactivity = async(req,res)=>{
     try {
         let profileid = req.profileid
@@ -29,7 +30,7 @@ let updatedactivity = async(req,res)=>{
         return res.status(500).send("internal error")
     }
 }
-
+// get activity //
 let getactivity = async (req, res) => {
     try {
         let profileid = req.profileid;

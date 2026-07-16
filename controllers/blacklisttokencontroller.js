@@ -1,5 +1,6 @@
 let jwt = require("jsonwebtoken")
 let BlacklistToken = require("../models/blacklisttoken")
+// logout method //
 let logout = async(req,res)=>{
     try {
         let token =req.headers.authorization?.split(" ")[1];

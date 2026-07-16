@@ -77,6 +77,7 @@ let getgroupmessage = async(req,res)=>{
     }
 
 }
+// delete message in this admin and message owner can delete the message //
 let deletemessage = async(req,res)=>{
     try {
         let senderid = req.profileid

@@ -24,7 +24,6 @@ let createprofile = async(req,res)=>{
     req.file
     ?
     req.file.path:Defaultpic
-
 })
     await profile.save()
     return res.json({
@@ -142,7 +141,7 @@ let profileedit = async(req,res)=>{
        return res.status(500).send("internal error")   
     }
 }
-
+// changing password in setting //
 let changepassword = async (req, res) => {
     try {
         let profileid = req.profileid;
@@ -200,7 +199,7 @@ let changepassword = async (req, res) => {
         return res.status(500).send("Internal server error");
     }
 };
-
+// delete account it will delete only userid and profileid from the database)
 let deleteaccount = async(req,res)=>{
     try {
         let profileid = req.profileid
