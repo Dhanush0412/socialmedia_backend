@@ -427,8 +427,7 @@ let getRejectedInvites = async (req, res) => {
         if (!group) {
             return res.status(404).send("Group not found");
         }
-        if (
-            String(group.createdby) !==String(profileid)) {
+        if (String(group.createdby) !==String(profileid)) {
             return res.status(401).send("Only admin can view rejected invites");
         }
       let rejectedInvites = await Groupinvite.find({

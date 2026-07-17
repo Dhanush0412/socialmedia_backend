@@ -15,8 +15,7 @@ const io = new Server(server, {
             "POST",
             "PUT",
             "DELETE"
-        ],
-        credentials: true
+        ]
     }
 });
 
@@ -33,8 +32,7 @@ app.use(
             "POST",
             "PUT",
             "DELETE"
-        ],
-        credentials: true
+        ]
     })
 );
  
