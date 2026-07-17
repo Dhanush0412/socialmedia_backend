@@ -293,8 +293,14 @@ let getgroupdetails = async(req,res)=>{
     try{
         let { groupid } = req.params;
         let group =await Group.findById(groupid)
-        .populate("createdby")
-        .populate("members");
+         .populate({ 
+            path: "createdby", 
+            populate: { path: "user" } 
+           })
+         .populate({ 
+            path: "members", 
+            populate: { path: "user" } 
+           });
         if(!group){
             return res.status(404).send("group not found");
         }

@@ -61,7 +61,10 @@ let getgroupmessage = async(req,res)=>{
        let messages = await Message.find({
          group: groupid
            })
-          .populate("sender")
+             .populate({
+                 path: "sender", 
+                 populate: { path: "user" } 
+                })
            .populate(
                 "group",
                 "groupname groupimage createdby"
