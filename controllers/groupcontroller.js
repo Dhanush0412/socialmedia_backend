@@ -193,127 +193,75 @@ let rejectinvite = async(req,res)=>{
 }
 
 // getting group  //
-let getmygroup= async (req,res)=>{
+let getmygroup = async (req, res) => {
     try {
-
-        let profileid = req.profileid
+        let profileid = req.profileid;
         let profile = await Profile.findById(profileid)
-        .populate("groups")
-        if(!profile){
-            return res.status(404).send("profile not found")
-        }
-        return res.json(profile.groups);
-    } 
-    catch (error) {
-        console.log(error)
-        return res.status(500).send("internal error")
-    }
-}
+        .populate({
+            path: "groups",
+            populate: [
+                {
+                    path: "createdby",
+                    select: "profilepic user",
+                    populate: {
+                        path: "user",
+                        select: "username"
+                    }
+                },
+                {
+                    path: "members",
+                    select: "profilepic user",
+                    populate: {
+                        path: "user",
+                        select: "username"
+                    }
+                }
+            ]
+        });
 
-// groupchatpreview //
-let groupchatpreview = async(req,res)=>{
-    try{
-        let profileid  = req.profileid;
-        let profile =await Profile.findById(profileid);
-        if(!profile){
+        if (!profile) {
             return res.status(404).send("profile not found");
         }
-        let result =await Message.aggregate([
-            {
-                $match:{
-                    group:{
-                        $in:
-                        profile.groups
-                    }
-                }
-            },
-
-            {
-                $sort:{
-                    createdAt:-1
-                }
-            },
-
-            {
-                $group:{
-
-                    _id:"$group",
-
-                    latestMessage:{
-                        $first:"$text"
-                    },
-
-                    latestTime:{
-                        $first:"$createdAt"
-                    }
-
-                }
-            },
-
-            {
-                $lookup:{
-                    from:"groups",
-                    localField:"_id",
-                    foreignField:"_id",
-                    as:"group"
-                }
-            },
-
-            {
-                $unwind:"$group"
-            },
-
-            {
-                $project:{
-                    groupid:"$group._id",
-                    groupname:"$group.groupname",
-                    groupimage:"$group.groupimage",
-                    latestMessage:1,
-                    latestTime:1
-                }
-            },
-            {
-                $sort:{
-                    latestTime:-1
-                }
-            }
-
-        ]);
-        return res.json(result);
-    }
-    catch(error){
+        return res.json(profile.groups);
+    } catch (error) {
         console.log(error);
         return res.status(500).send("internal error");
     }
+};
 
-}
 
-// getting group details //
-
-let getgroupdetails = async(req,res)=>{
-    try{
+let getgroupdetails = async (req, res) => {
+    try {
         let { groupid } = req.params;
-        let group =await Group.findById(groupid)
-         .populate({ 
-            path: "createdby", 
-            populate: { path: "user" } 
-           })
-         .populate({ 
-            path: "members", 
-            populate: { path: "user" } 
-           });
-        if(!group){
+        let group = await Group.findById(groupid)
+            // Admin details
+            .populate({
+                path: "createdby",
+                select: "profilepic user",
+                populate: {
+                    path: "user",
+                    select: "username"
+                }
+            })
+            // Members details
+            .populate({
+                path: "members",
+                select: "profilepic user",
+                populate: {
+                    path: "user",
+                    select: "username"
+                }
+            });
+        if (!group) {
             return res.status(404).send("group not found");
         }
         return res.json(group);
-    }
-    catch(error){
+
+    } catch (error) {
         console.log(error);
         return res.status(500).send("internal error");
     }
-
-}
-
+};
 // members can exit the group //
 let groupexit = async (req,res)=>{
     try {
