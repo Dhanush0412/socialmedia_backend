@@ -51,7 +51,8 @@ let sendgroupinvite =async(req,res)=>{
         if(String(senderid) === String(receiverid)){
             return res.status(400).send("cannot invite yourself");
          }
-         let inviter = await Profile.findById(senderid);
+         let inviter = await Profile.findById(senderid)
+         .populate("user")
          let invited = await Profile.findById(receiverid);
           if (inviter.blockedusers.includes(receiverid) ||
               invited.blockedusers.includes(senderid))
@@ -90,7 +91,7 @@ let sendgroupinvite =async(req,res)=>{
          receiverid:receiverid,
          senderid:senderid,
          type:"groupinvite",
-         message:"invited you to a group"
+         message: `${inviter.user.username} invited you to ${group.groupname} group`
         });
         return res.status(200).send("invite sent");
 

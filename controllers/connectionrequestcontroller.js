@@ -12,7 +12,8 @@ let sendrequest = async (req,res)=>{
         if(senderid == receiverid){
             return res.status(403).send("cannot send request to yourself")
         }
-         let senderProfile = await Profile.findById(senderid);
+         let senderProfile = await Profile.findById(senderid)
+         .populate("user")
          let receiverProfile = await Profile.findById(receiverid);
 
           if (senderProfile.blockedusers.includes(receiverid) ||receiverProfile.blockedusers.includes(senderid)) 
@@ -47,7 +48,7 @@ let sendrequest = async (req,res)=>{
               receiverid:receiverid,
               senderid:senderid,
               type:"connectionrequest",
-              message:"sent you a connection request"
+              message: `${senderProfile.user.username} sent you a connection request`
           });
             return res.status(200).send("request sent")
             }
@@ -62,7 +63,7 @@ let sendrequest = async (req,res)=>{
          receiverid:receiverid,
          senderid:senderid,
          type:"connectionrequest",
-         message:"sent you a connection request"
+         message: `${senderProfile.user.username} sent you a connection request`
 
           });
           
@@ -117,13 +118,15 @@ let acceptrequest = async(req,res)=>{
             return res.status(429).send("already you rejected the request")
          }
         request.status="accepted"
-        await request.save();
+        await request.save()
+          let acceptperson = await Profile.findById(request.receiver)
+            .populate("user");
         await Notification.create({
 
          receiverid:request.sender,
          senderid:request.receiver,
          type:"connectionaccepted",
-         message:"accepted your connection request"
+         message:`${acceptperson.user.username} accepted your connection request`
          });
 
         let senderprofile = await Profile.findById(request.sender)
@@ -156,11 +159,13 @@ let acceptrequest = async(req,res)=>{
          }
         request.status="rejected"
         await request.save();
+         let rejectedperson = await Profile.findById(request.receiver)
+            .populate("user");
         await Notification.create({
             receiverid: request.sender,
             senderid: request.receiver,
             type: "connectionrejected",
-            message: "rejected your connection request"
+            message:`${rejectedperson.user.username} rejected your connection request`
          });
         return res.status(200).send("request rejected")
     } catch (error) {

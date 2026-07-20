@@ -68,6 +68,7 @@ let likes = async(req,res)=>{
         let {postid} = req.params
 
         let profile = await Profile.findById(profileid)
+        .populate("user");
         if(!profile){
             return res.status(400).send("profile not found")
         }
@@ -87,11 +88,12 @@ let likes = async(req,res)=>{
             receiverid:post.profile,
             senderid:profileid,
             type:"like",
-            message:"liked your post"
+              message:`${profile.user.username} liked your post`
             });
          }
         return res.json({
             message:"liked",
+            username:profile.user.username,
             totallikes:post.likes.length
     })
 
@@ -139,6 +141,7 @@ let addcomment = async (req,res)=>{
         let {text} = req.body
 
         let profile = await Profile.findById(profileid)
+        .populate("user")
         if(!profile){
             return res.status(404).send("profile not found")
         }
@@ -160,7 +163,7 @@ let addcomment = async (req,res)=>{
                 receiverid:post.profile,
                 senderid:profileid,
                 type:"comment",
-                message:"commented on your post"
+                message:`${profile.user.username} commented on your post`
             })
 
         }
