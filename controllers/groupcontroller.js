@@ -426,4 +426,33 @@ let getRejectedInvites = async (req, res) => {
         return res.status(500).send("Internal error");
     }
 };
-module.exports={creategroup,sendgroupinvite,getpendinginvites,acceptinvite,rejectinvite,getmygroup,getgroupdetails,groupexit,searchConnectedUsers,getRejectedInvites};
+// update group profile picture //
+let updategrouppic = async (req, res) => {
+    try {
+        let profileid = req.profileid;
+        let { groupid } = req.params;
+        let group = await Group.findById(groupid);
+        if (!group) {
+            return res.status(404).send("group not found");
+        }
+        if (String(group.createdby) !== String(profileid)) {
+            return res.status(401).send("only admin can change group profile picture");
+        }
+        if (!req.file) {
+            return res.status(400).send("please upload group profile picture");
+        }
+        if (!req.file.mimetype.startsWith("image/")) {
+            return res.status(400).send("only image is allowed");
+        }
+        group.groupimage = req.file.path;
+        await group.save();
+        return res.status(200).json({
+            message: "group profile picture updated",
+            groupimage: group.groupimage
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send("internal error");
+    }
+};
+module.exports={creategroup,sendgroupinvite,getpendinginvites,acceptinvite,rejectinvite,getmygroup,getgroupdetails,groupexit,searchConnectedUsers,getRejectedInvites,updategrouppic};

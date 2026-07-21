@@ -158,157 +158,60 @@ let unreadcount =async(req,res)=>{
 
 // getting chat list  method//
 let getchatlist =async(req,res)=>{
-try{
-let  profileid  =req.profileid;
-let chats =await Directmessage.aggregate([
-{
-    $match:{
-
-        $or:[
-        {
-            sender:new mongoose.Types.ObjectId(profileid)
-        },
-        {
-            receiver:new mongoose.Types.ObjectId(profileid)
-        }
-        ]
-    }
-},
-
-{
-    $sort:{
-        createdAt:-1
-    }
-},
-
-{
-    $group:{
-        _id:{
-            $cond:[
-                {
-                    $eq:[
-                        "$sender",new mongoose.Types.ObjectId(profileid)
-                       ]
-                },
-                "$receiver",
-                "$sender"
-            ]
-        },
-        latestMessage:{
-            $first:"$text"
-        },
-        latestTime:{
-            $first:"$createdAt"
-        }
-    }
-},
-
-   {
-    $sort:{
-        latestTime:-1
-    }
-   }
-
-  ]);
-
-   return res.json(chats);
-
-}
-catch(error){
-   console.log(error);
-   return res.status(500).send("internal error");
-}
-}
-
-// chatpreview method //
-
-let chatpreview = async(req,res)=>{
-try{
-let  profileid  = req.profileid;
-let result = await Directmessage.aggregate([
-{
-    $match:{
-
-        $or:[
-
-            {
-                sender:new mongoose.Types.ObjectId(profileid)
-            },
-            {
-                receiver:new mongoose.Types.ObjectId(profileid)
-            }
-        ]
-
-    }
-},
-
-{
-    $sort:{
-        createdAt:-1
-    }
-},
-
-{
-    $group:{
-        _id:{
-            $cond:[
-                {
-                    $eq:[
-                        "$sender",new mongoose.Types.ObjectId(profileid)
+        try{
+            let  profileid  =req.profileid;
+            let chats =await Directmessage.aggregate([
+              {
+                 $match:{
+                     $or:[
+                      {
+                        sender:new mongoose.Types.ObjectId(profileid)
+                      },
+                      {
+                        receiver:new mongoose.Types.ObjectId(profileid)
+                      }
                     ]
-                },
-                "$receiver",
-                "$sender"
-            ]
-
-        },
-
-        latestMessage:{
-            $first:"$text"
-        },
-
-        latestTime:{
-            $first:"$createdAt"
-        }
-
+                }
+             },
+             {
+              $sort:{
+                   createdAt:-1
+                 }
+            },
+           {
+            $group:{
+                     _id:{
+                      $cond:[
+                             {
+                             $eq:[
+                                 "$sender",new mongoose.Types.ObjectId(profileid)
+                                ]
+                             },
+                             "$receiver",
+                             "$sender"
+                            ]
+                        },
+                 latestMessage:{
+                   $first:"$text"
+                   },
+                  latestTime:{
+                  $first:"$createdAt"
+                 }
+             }
+         },
+         {
+            $sort:{
+                latestTime:-1
+            }
+         }
+     ]);
+     return res.json(chats);
     }
-
-},
-
-{
-    $lookup:{
-        from:"profiles",
-        localField:"_id",
-        foreignField:"_id",
-        as:"friend"
-    }
-},
-
-{
-    $unwind:"$friend"
-},
-{
-    $project:{
-        friendid:"$friend._id",
-        profilepic:"$friend.profilepic",
-        latestMessage:1,
-        latestTime:1
-    }
-},
-{
-    $sort:{
-        latestTime:-1
-    }
+    catch(error){
+          console.log(error);
+          return res.status(500).send("internal error");
+         }
 }
-]);
-return res.json(result);
-}
-catch(error){
-  console.log(error);
-  return res.status(500).send("internal error");
-}
-}
-
 
 // deleting direct message //
 let deletemessage = async(req,res)=>{
@@ -350,4 +253,4 @@ let editmessage = async(req,res)=>{
         return res.status(500).send("Internal error")
     }
 }
-module.exports={senddirectmessage,getdirectmessage,markmessagesread,unreadcount,getchatlist,chatpreview,deletemessage,editmessage}
+module.exports={senddirectmessage,getdirectmessage,markmessagesread,unreadcount,getchatlist,deletemessage,editmessage}
