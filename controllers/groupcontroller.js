@@ -334,23 +334,29 @@ let searchConnectedUsers = async (req, res) => {
     try {
         let profileid = req.profileid;
         let {groupid} = req.params;
-        let { username } = req.query;
+        let { username="" } = req.query;
         let group = await Group.findById(groupid)
         if(!group){
             return res.status(404).send("group not found")
-        }
-        if (!username) {
-            return res.status(400).send("Username is required");
         }
         let profile =await Profile.findById(profileid);
         if (!profile) {
             return res.status(404).send("Profile not found");
         }
+         let pendingInvites = await Groupinvite.find({
+            group: groupid,
+            status: "pending"
+            }).select("receiver");
+        let pendingReceiverIds = pendingInvites.map(
+            invite => invite.receiver
+        );
         let result =await Profile.find({
                  _id: {
                     $in:
                     profile.connections,
-                    $nin: group.members
+                    $nin:[ ...group.members,
+                          ...pendingReceiverIds
+                    ]
                    }
               })
             .populate({
@@ -385,9 +391,22 @@ let getRejectedInvites = async (req, res) => {
         if (String(group.createdby) !==String(profileid)) {
             return res.status(401).send("Only admin can view rejected invites");
         }
+          let activeInvites = await Groupinvite.find({
+            group: groupid,
+            status: {
+                $in: ["accepted", "pending"]
+            }
+            }).select("receiver");
+
+        let activeReceiverIds = activeInvites.map(
+            invite => invite.receiver
+        );
       let rejectedInvites = await Groupinvite.find({
         group: groupid,
-        status: "rejected"
+        status: "rejected",
+        receiver: {
+                $nin: activeReceiverIds
+            }
        })
       .populate({
         path: "receiver",
