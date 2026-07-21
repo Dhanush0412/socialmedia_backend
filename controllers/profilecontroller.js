@@ -2,7 +2,7 @@ let bcrypt = require("bcrypt")
 let Profile = require("../models/profile")
 let User = require("../models/user")
 let Post = require("../models/post")
-let Defaultpic = "https://res.cloudinary.com/dubjosis9/image/upload/v1782300064/demoimage_b0q161.jpg"
+let Defaultpic = "https://res.cloudinary.com/dubjosis9/image/upload/v1784634324/chris-curry-GYpsSWHslHA-unsplash_sfae9l.jpg"
 
 // creating profile //
 let createprofile = async(req,res)=>{

@@ -3,7 +3,7 @@ let Profile = require("../models/profile")
 let Groupinvite=require("../models/groupinvite")
 let Message = require("../models/message")
 let Notification = require("../models/notification")
-let Grouppic = "https://res.cloudinary.com/dubjosis9/image/upload/v1782723497/the-metropolitan-museum-of-art-eXVnyU2unms-unsplash_s5td03.jpg"
+let Grouppic = "https://res.cloudinary.com/dubjosis9/image/upload/v1784635245/jinwei-ding-6kW7LBDglVc-unsplash_tjmgbi.jpg"
 // group creation method  //
 let creategroup = async(req,res)=>{
     try {
@@ -76,7 +76,7 @@ let sendgroupinvite =async(req,res)=>{
             status:"pending"
         });
         if(group.members.includes(receiverid)){
-            return res.status(429).send("user all ready exist in the group")
+            return res.status(429).send("user already exist in the group")
         }
         if(existingInvite){
             return res.status(429).send("invite already sent");
@@ -167,14 +167,25 @@ let sendgroupinvite =async(req,res)=>{
 let rejectinvite = async(req,res)=>{
     try {
         let { inviteid } =req.params;
-        let invite =await Groupinvite.findById(inviteid);
+        let invite =await Groupinvite.findById(inviteid)
+        .populate({
+            path: "receiver",
+            populate: {
+                path: "user",
+                select: "username"
+            }
+        })
+        .populate({
+            path: "group",
+            select: "groupname"
+        });
         if(!invite){
             return res.status(404).send("invite not found");
         }
         if(invite.status!=="pending"){
             return res.status(429).send("invite already processed");
         }
-        if(String(invite.receiver)!== String(req.profileid)){
+        if(String(invite.receiver._id)!== String(req.profileid)){
            return res.status(401).send("unauthorized");
          }
         invite.status="rejected"
@@ -183,7 +194,7 @@ let rejectinvite = async(req,res)=>{
               receiverid: invite.sender,
               senderid: invite.receiver,
               type: "grouprejected",
-              message: "rejected your group invitation"
+              message: `${invite.receiver.user.username} rejected your ${invite.group.groupname} group invitation`
              });
         return res.status(200).send("invite rejected")
     } catch (error) {
