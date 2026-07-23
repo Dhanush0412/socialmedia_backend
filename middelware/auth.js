@@ -7,6 +7,9 @@ let verify = async(req,res,next)=>{
         if(!token){
             return res.send("token required")
         }
+         if (!token || token === "null" || token === "undefined") {
+            return res.status(401).send("invalid token");
+        }
        let blacklisted =await BlacklistToken.findOne({token});
         if(blacklisted){
           return res.status(401).send(
