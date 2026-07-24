@@ -29,37 +29,51 @@ let createpost = async(req,res)=>{
 
 
 // post getting to the connected user //
-let getfeed = async(req,res)=>{
-    try {
-    let profileid = req.profileid
-    let profile = await Profile.findById(profileid)
-        if(!profile){
-            return res.status(404).send("profile not found")
-        }  
-        let posts = await Post.find({
-            profile:{
-                $in:[...profile.connections,
-                    profile._id
-                ]
-            }
-        })
-        .populate({
-            path:"profile",
-            populate:{
-                path:"user"
-            }
-        })
-        .sort(
-            {
-                createdAt:-1
-            }
-        )
-      return res.json(posts);
-    } catch (error) {
-    console.log(error)
-    return res.status(500).send("internal error")
+let getfeed = async (req, res) => {
+  try {
+    const profileid = req.profileid;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 3;
+    const skip = (page - 1) * limit;
+    const profile = await Profile.findById(profileid);
+    if (!profile) {
+      return res.status(404).send("profile not found");
+    }
+    const query = {
+      profile: {
+        $in: [
+          ...profile.connections,
+          profile._id,
+        ],
+      },
+    };
+    const totalPosts = await Post.countDocuments(query);
+    const posts = await Post.find(query)
+      .populate({
+        path: "profile",
+        populate: {
+          path: "user",
+        },
+      })
+      .sort({
+        createdAt: -1,
+      })
+      .skip(skip)
+      .limit(limit);
+    return res.json({
+      posts,
+      currentPage: page,
+      totalPages: Math.ceil(totalPosts / limit),
+      totalPosts,
+      hasMore: skip + posts.length < totalPosts,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send("internal error");
   }
-}
+
+};
+ 
 // post likes //
 
 let likes = async(req,res)=>{
